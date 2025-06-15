@@ -1,0 +1,36 @@
+@startuml
+actor PlayerA
+actor PlayerB
+participant "Matchmaking Service" as Matchmaking
+participant "Game Session Service" as GameSession
+participant "Scoreboard Service" as Scoreboard
+
+== Anslutning ==
+PlayerA -> Matchmaking: joinQueue()
+Matchmaking -> PlayerA: waiting for opponent
+
+PlayerB -> Matchmaking: joinQueue()
+Matchmaking -> GameSession: createSession(playerA, playerB)
+Matchmaking -> PlayerA: matchFound(matchId)
+Matchmaking -> PlayerB: matchFound(matchId)
+
+== Starta match ==
+PlayerA -> GameSession: connect(matchId)
+PlayerB -> GameSession: connect(matchId)
+GameSession -> PlayerA: sendInitialState()
+GameSession -> PlayerB: sendInitialState()
+
+== Spel pågår ==
+loop varje frame
+    PlayerA -> GameSession: sendInput(up/down)
+    PlayerB -> GameSession: sendInput(up/down)
+    GameSession -> PlayerA: sendGameState()
+    GameSession -> PlayerB: sendGameState()
+end
+
+== Match slut ==
+GameSession -> Scoreboard: postResult(playerA, playerB, score)
+GameSession -> PlayerA: gameOver(winner)
+GameSession -> PlayerB: gameOver(winner)
+@enduml
+∏
