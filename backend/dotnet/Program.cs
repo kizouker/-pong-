@@ -1,0 +1,1 @@
+Console.WriteLine(".NET Core");
